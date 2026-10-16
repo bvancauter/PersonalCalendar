@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="PersonalCalendar.Tests/PersonalCalendar.Tests.csproj" Id="a65cc5de-bcd9-4e74-8971-6a5ca1d053ac" />
   <Project Path="PersonalCalendar/PersonalCalendar.csproj" />
 </Solution>
