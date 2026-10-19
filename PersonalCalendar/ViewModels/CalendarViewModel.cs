@@ -1,4 +1,5 @@
 ﻿using PersonalCalendar.Commands;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -14,11 +15,14 @@ namespace PersonalCalendar.ViewModels {
                     _currentMonth = value;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(CurrentMonthName));
+                    GenerateDays();
                 }
             }
         }
 
         public string CurrentMonthName => _currentMonth.ToString("MMMM yyyy");
+
+        public ObservableCollection<CalendarDayViewModel> Days { get; } = new();
 
         public ICommand PreviousMonthCommand { get; }
         public ICommand NextMonthCommand { get; }
@@ -26,6 +30,22 @@ namespace PersonalCalendar.ViewModels {
         public CalendarViewModel() {
             PreviousMonthCommand = new RelayCommand(_ => CurrentMonth = CurrentMonth.AddMonths(-1));
             NextMonthCommand = new RelayCommand(_ => CurrentMonth = CurrentMonth.AddMonths(1));
+            GenerateDays();
+        }
+
+        private void GenerateDays() {
+            Days.Clear();
+
+            var firstDayOfMonth = new DateOnly(CurrentMonth.Year, CurrentMonth.Month, 1);
+
+            int offset = ((int) firstDayOfMonth.DayOfWeek + 6) % 7;
+
+            var firstDayToDisplay = firstDayOfMonth.AddDays(-offset);
+
+            for (int i = 0; i < 42; i++) {
+                var date = firstDayToDisplay.AddDays(i);
+                Days.Add(new CalendarDayViewModel(date, CurrentMonth.Month, CurrentMonth.Year));
+            }
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

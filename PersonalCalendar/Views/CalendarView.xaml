@@ -9,13 +9,14 @@
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
         <StackPanel Grid.Row="0"
                     Orientation="Horizontal"
                     HorizontalAlignment="Center"
-                    VerticalAlignment="Top">
+                    Margin="0,0,0,20">
 
             <Button Content="Previous"
                     Command="{Binding PreviousMonthCommand}"
@@ -33,5 +34,40 @@
                     Padding="12,6"
                     Margin="10,0" />
         </StackPanel>
+
+        <UniformGrid Grid.Row="1"
+                     Columns="7"
+                     Margin="0,0,0,8">
+            <TextBlock Text="Lun" HorizontalAlignment="Center"/>
+            <TextBlock Text="Mar" HorizontalAlignment="Center"/>
+            <TextBlock Text="Mer" HorizontalAlignment="Center"/>
+            <TextBlock Text="Jeu" HorizontalAlignment="Center"/>
+            <TextBlock Text="Ven" HorizontalAlignment="Center"/>
+            <TextBlock Text="Sam" HorizontalAlignment="Center"/>
+            <TextBlock Text="Dim" HorizontalAlignment="Center"/>
+        </UniformGrid>
+
+        <ItemsControl Grid.Row="2"
+                      ItemsSource="{Binding Days}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="7" Rows="6"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="LightGray"
+                            BorderThickness="0.5"
+                            Margin="2"
+                            Padding="6">
+                        <TextBlock Text="{Binding DayNumber}"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Top"
+                                   FontSize="14"/>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </Window>
