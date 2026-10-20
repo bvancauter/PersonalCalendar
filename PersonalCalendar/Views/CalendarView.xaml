@@ -5,69 +5,146 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PersonalCalendar.Views"
         mc:Ignorable="d"
-        Title="CalendarView" Height="450" Width="800">
-    <Grid Margin="20">
+        Title="Personal Calendar"
+        Height="600"
+        Width="800"
+        WindowStartupLocation="CenterScreen"
+        Background="WhiteSmoke">
+
+    <Window.Resources>
+
+        <Style x:Key="NavigationButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Margin" Value="10,0"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="DarkSlateGray"/>
+            <Setter Property="BorderBrush" Value="LightGray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style x:Key="WeekdayStyle" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="DarkSlateGray"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <Style x:Key="DayNumberStyle" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Foreground" Value="DarkSlateGray"/>
+            <Setter Property="FontSize" Value="14"/>
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsCurrentMonth}" Value="False">
+                    <Setter Property="Foreground" Value="DarkGray"/>
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding IsToday}" Value="True">
+                    <Setter Property="Foreground" Value="DarkBlue"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid Margin="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
+        <!-- month navigation -->
         <StackPanel Grid.Row="0"
                     Orientation="Horizontal"
                     HorizontalAlignment="Center"
-                    Margin="0,0,0,20">
+                    Margin="0,0,0,24">
 
-            <Button Content="Previous"
+            <Button Content="◀"
                     Command="{Binding PreviousMonthCommand}"
-                    Padding="12,6"
-                    Margin="10,0" />
+                    Style="{StaticResource NavigationButtonStyle}"/>
 
             <TextBlock Text="{Binding CurrentMonthName}"
                        FontSize="28"
                        FontWeight="Bold"
+                       Foreground="DarkSlateGray"
                        VerticalAlignment="Center"
-                       Margin="10,0" />
-            
-            <Button Content="Next"
+                       MinWidth="220"
+                       TextAlignment="Center"
+                       Margin="10,0"/>
+
+            <Button Content="▶"
                     Command="{Binding NextMonthCommand}"
-                    Padding="12,6"
-                    Margin="10,0" />
+                    Style="{StaticResource NavigationButtonStyle}"/>
         </StackPanel>
 
-        <UniformGrid Grid.Row="1"
-                     Columns="7"
-                     Margin="0,0,0,8">
-            <TextBlock Text="Lun" HorizontalAlignment="Center"/>
-            <TextBlock Text="Mar" HorizontalAlignment="Center"/>
-            <TextBlock Text="Mer" HorizontalAlignment="Center"/>
-            <TextBlock Text="Jeu" HorizontalAlignment="Center"/>
-            <TextBlock Text="Ven" HorizontalAlignment="Center"/>
-            <TextBlock Text="Sam" HorizontalAlignment="Center"/>
-            <TextBlock Text="Dim" HorizontalAlignment="Center"/>
-        </UniformGrid>
+        <!-- headers days -->
+        <Border Grid.Row="1"
+                Background="LightSteelBlue"
+                CornerRadius="8"
+                Padding="0,12"
+                Margin="0,0,0,8">
 
-        <ItemsControl Grid.Row="2"
-                      ItemsSource="{Binding Days}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <UniformGrid Columns="7" Rows="6"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
+            <UniformGrid Columns="7">
+                <TextBlock Text="Lun" Style="{StaticResource WeekdayStyle}"/>
+                <TextBlock Text="Mar" Style="{StaticResource WeekdayStyle}"/>
+                <TextBlock Text="Mer" Style="{StaticResource WeekdayStyle}"/>
+                <TextBlock Text="Jeu" Style="{StaticResource WeekdayStyle}"/>
+                <TextBlock Text="Ven" Style="{StaticResource WeekdayStyle}"/>
+                <TextBlock Text="Sam" Style="{StaticResource WeekdayStyle}"/>
+                <TextBlock Text="Dim" Style="{StaticResource WeekdayStyle}"/>
+            </UniformGrid>
+        </Border>
 
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border BorderBrush="LightGray"
-                            BorderThickness="0.5"
-                            Margin="2"
-                            Padding="6">
-                        <TextBlock Text="{Binding DayNumber}"
-                                   HorizontalAlignment="Right"
-                                   VerticalAlignment="Top"
-                                   FontSize="14"/>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <!-- Grid of days -->
+        <Border Grid.Row="2"
+                Background="White"
+                BorderBrush="LightGray"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="6">
+
+            <ItemsControl ItemsSource="{Binding Days}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="7" Rows="6"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="LightGray"
+                                BorderThickness="0.5"
+                                Background="White"
+                                CornerRadius="4"
+                                Margin="3"
+                                Padding="8">
+
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="White"/>
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsToday}" Value="True">
+                                            <Setter Property="Background" Value="AliceBlue"/>
+                                            <Setter Property="BorderBrush" Value="SteelBlue"/>
+                                            <Setter Property="BorderThickness" Value="2"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+
+                            <TextBlock Text="{Binding DayNumber}"
+                                       Style="{StaticResource DayNumberStyle}"/>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
     </Grid>
 </Window>
