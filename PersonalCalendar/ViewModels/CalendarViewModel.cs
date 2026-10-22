@@ -59,6 +59,7 @@ namespace PersonalCalendar.ViewModels {
 
         private void GenerateDays() {
             Days.Clear();
+            SelectedDay = null;
 
             var firstDayOfMonth = new DateOnly(CurrentMonth.Year, CurrentMonth.Month, 1);
 
