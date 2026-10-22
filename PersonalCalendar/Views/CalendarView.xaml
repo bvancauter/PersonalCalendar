@@ -57,6 +57,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- month navigation -->
@@ -117,34 +118,59 @@
                 </ItemsControl.ItemsPanel>
 
                 <ItemsControl.ItemTemplate>
+
                     <DataTemplate>
-                        <Border BorderBrush="LightGray"
-                                BorderThickness="0.5"
-                                Background="White"
-                                CornerRadius="4"
-                                Margin="3"
-                                Padding="8">
+                        <Button Command="{Binding DataContext.SelectDayCommand, 
+                            RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                CommandParameter="{Binding}"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="0"
+                                HorizontalContentAlignment="Stretch"
+                                VerticalContentAlignment="Stretch"
+                                Cursor="Hand"
+                                Focusable="False">
+                            <Border CornerRadius="4"
+                                    Margin="3"
+                                    Padding="8">
+                                <Border.Style>
+                                    <Style TargetType="{x:Type Border}">
+                                        <Setter Property="Background" Value="White"/>
+                                        <Setter Property="BorderBrush" Value="LightGray"/>
+                                        <Setter Property="BorderThickness" Value="0.5"/>
 
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="Background" Value="White"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsToday}" Value="True">
+                                                <Setter Property="Background" Value="AliceBlue"/>
+                                                <Setter Property="BorderBrush" Value="SteelBlue"/>
+                                                <Setter Property="BorderThickness" Value="2"/>
+                                            </DataTrigger>
 
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsToday}" Value="True">
-                                            <Setter Property="Background" Value="AliceBlue"/>
-                                            <Setter Property="BorderBrush" Value="SteelBlue"/>
-                                            <Setter Property="BorderThickness" Value="2"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
+                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="Background" Value="LightSteelBlue"/>
+                                                <Setter Property="BorderBrush" Value="DarkBlue"/>
+                                                <Setter Property="BorderThickness" Value="2"/>
+                                            </DataTrigger>
 
-                            <TextBlock Text="{Binding DayNumber}"
-                                       Style="{StaticResource DayNumberStyle}"/>
-                        </Border>
+                                            <DataTrigger Binding="{Binding IsCurrentMonth}" Value="False">
+                                                <Setter Property="Opacity" Value="0.55"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="{Binding DayNumber}" 
+                                           Style="{StaticResource DayNumberStyle}"/>
+                            </Border>
+                        </Button>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Border>
+        <TextBlock Grid.Row="3" 
+                   Text="{Binding SelectedDate, StringFormat='Date sélectionnée : {0:dd MMMM yyyy}'}"
+                   FontSize="14"
+                   Foreground="DarkSlateGray"
+                   Margin="3,12,3,0"
+                   HorizontalAlignment="Left"/>
     </Grid>
 </Window>

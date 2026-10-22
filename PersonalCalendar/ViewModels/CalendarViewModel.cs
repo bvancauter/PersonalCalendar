@@ -7,7 +7,6 @@ using System.Windows.Input;
 namespace PersonalCalendar.ViewModels {
     public class CalendarViewModel : INotifyPropertyChanged {
         private DateTime _currentMonth = new(DateTime.Today.Year, DateTime.Today.Month, 1);
-
         public DateTime CurrentMonth {
             get => _currentMonth;
             set {
@@ -20,16 +19,41 @@ namespace PersonalCalendar.ViewModels {
             }
         }
 
+        private CalendarDayViewModel? _selectedDay;
+        public CalendarDayViewModel? SelectedDay {
+            get => _selectedDay;
+            set {
+                if (_selectedDay != value) {
+                    if (_selectedDay is not null) {
+                        _selectedDay.IsSelected = false;
+                    }
+                    _selectedDay = value;
+                    if (_selectedDay is not null) {
+                        _selectedDay.IsSelected = true;
+                    }
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(SelectedDate));
+                }
+            }
+        }
+
+        public DateOnly? SelectedDate => SelectedDay?.Date;
+
         public string CurrentMonthName => _currentMonth.ToString("MMMM yyyy");
 
         public ObservableCollection<CalendarDayViewModel> Days { get; } = new();
 
         public ICommand PreviousMonthCommand { get; }
         public ICommand NextMonthCommand { get; }
+        public ICommand SelectDayCommand { get; }
 
         public CalendarViewModel() {
             PreviousMonthCommand = new RelayCommand(_ => CurrentMonth = CurrentMonth.AddMonths(-1));
             NextMonthCommand = new RelayCommand(_ => CurrentMonth = CurrentMonth.AddMonths(1));
+            SelectDayCommand = new RelayCommand(day => {
+                if (day is CalendarDayViewModel selectedDay)
+                    SelectedDay = selectedDay;
+            });
             GenerateDays();
         }
 
