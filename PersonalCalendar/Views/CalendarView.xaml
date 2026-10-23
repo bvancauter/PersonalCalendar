@@ -172,5 +172,12 @@
                    Foreground="DarkSlateGray"
                    Margin="3,12,3,0"
                    HorizontalAlignment="Left"/>
+        <Button Grid.Row="3"
+                Content="Voir la journée"
+                Command="{Binding ViewDayCommand}"
+                HorizontalAlignment="Right"
+                Padding="12,6"
+                Margin="0,8,0,0"
+                IsEnabled="{Binding HasSelectedDay}"/>
     </Grid>
 </Window>

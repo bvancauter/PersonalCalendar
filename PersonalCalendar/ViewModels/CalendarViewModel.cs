@@ -1,7 +1,9 @@
 ﻿using PersonalCalendar.Commands;
+using PersonalCalendar.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Input;
 
 namespace PersonalCalendar.ViewModels {
@@ -33,9 +35,12 @@ namespace PersonalCalendar.ViewModels {
                     }
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(SelectedDate));
+                    OnPropertyChanged(nameof(HasSelectedDay));
                 }
             }
         }
+
+        public bool HasSelectedDay => SelectedDay is not null;
 
         public DateOnly? SelectedDate => SelectedDay?.Date;
 
@@ -46,6 +51,7 @@ namespace PersonalCalendar.ViewModels {
         public ICommand PreviousMonthCommand { get; }
         public ICommand NextMonthCommand { get; }
         public ICommand SelectDayCommand { get; }
+        public ICommand ViewDayCommand { get; }
 
         public CalendarViewModel() {
             PreviousMonthCommand = new RelayCommand(_ => CurrentMonth = CurrentMonth.AddMonths(-1));
@@ -54,6 +60,13 @@ namespace PersonalCalendar.ViewModels {
                 if (day is CalendarDayViewModel selectedDay)
                     SelectedDay = selectedDay;
             });
+            ViewDayCommand = new RelayCommand(_ => {
+                if (SelectedDay is not null) {
+                    var window = new DayDetailsView(SelectedDay.Date);
+                    window.Owner = Application.Current.MainWindow;
+                    window.ShowDialog();
+                }
+            }, _ => SelectedDay is not null);
             GenerateDays();
         }
 
