@@ -20,8 +20,7 @@
         </Grid.RowDefinitions>
         
         <!-- Selected Date -->
-        <TextBlock x:Name="SelectedDateTextBlock"
-                   Text="Détails de la journée"
+        <TextBlock Text="{Binding SelectedDateText}"
                    FontSize="16"
                    FontWeight="Bold"
                    Foreground="DarkSlateGray"
