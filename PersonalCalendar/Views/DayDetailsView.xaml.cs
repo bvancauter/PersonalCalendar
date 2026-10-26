@@ -33,6 +33,12 @@ namespace PersonalCalendar.Views {
             foreach (var calendarEvent in events) {
                 Events.Add(calendarEvent);
             }
+            Events.Add(new CalendarEvent {
+                Title = "New Event",
+                Date = selectedDate,
+                StartTime = TimeOnly.FromDateTime(DateTime.Now),
+                EndTime = TimeOnly.FromDateTime(DateTime.Now.AddHours(1)),
+            });
         }
 
         private void LoadTasks(DateOnly selectedDate) {

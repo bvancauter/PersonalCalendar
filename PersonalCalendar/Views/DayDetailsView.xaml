@@ -48,12 +48,14 @@
         </Grid>
         
         <!-- Events and Tasks List -->
+
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             
+            <!-- Events -->
             <Border Grid.Column="0"
                     Background="White"
                     BorderBrush="LightGray"
@@ -61,27 +63,62 @@
                     CornerRadius="6"
                     Margin="0,0,6,0"
                     Padding="12">
-                <ListBox ItemsSource="{Binding Events}"
-                         BorderThickness="0"
-                         Background="Transparent">
+                <Grid>
+                    <TextBlock Text="Aucun événement pour cette journée."
+                               Foreground="DarkGray"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Events.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
 
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Margin="0,0,0,12">
-                                <TextBlock Text="{Binding Title}"
-                                           FontSize="14"
-                                           FontWeight="SemiBold"
-                                           Foreground="DarkSlateGray"/>
+                    <ListBox ItemsSource="{Binding Events}"
+                             BorderThickness="0"
+                             Background="Transparent">
+                        <ListBox.Style>
+                            <Style TargetType="ListBox">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Events.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.Style>
 
-                                <TextBlock Text="{Binding StartTime}"
-                                           FontSize="12"
-                                           Foreground="DarkGray"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,0,0,12">
+                                    <TextBlock Text="{Binding Title}"
+                                               FontSize="14"
+                                               FontWeight="SemiBold"
+                                               Foreground="DarkSlateGray"/>
+                                    <TextBlock FontSize="12"
+                                               Foreground="DarkGray">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0:HH\:mm} - {1:HH\:mm}">
+                                                <Binding Path="StartTime"/>
+                                                <Binding Path="EndTime"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
             </Border>
-            
+
+            <!-- Tasks -->
             <Border Grid.Column="1"
                     Background="White"
                     BorderBrush="LightGray"
@@ -89,29 +126,55 @@
                     CornerRadius="6"
                     Margin="6,0,0,0"
                     Padding="12">
-                <ListBox ItemsSource="{Binding Tasks}"
-                         BorderThickness="0"
-                         Background="Transparent">
-                    
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Margin="0,0,0,12">
-                                <TextBlock Text="{Binding Title}"
-                                           FontSize="14"
-                                           FontWeight="SemiBold"
-                                           Foreground="DarkSlateGray"/>
-                                
-                                <TextBlock Text="{Binding Time}"
-                                           FontSize="12"
-                                           Foreground="DarkGray"/>
-                                
-                                <TextBlock Text="{Binding IsCompleted}"
-                                           FontSize="12"
-                                           Foreground="Gray"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                <Grid>
+                    <TextBlock Text="Aucune tâche pour cette journée."
+                               Foreground="DarkGray"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Tasks.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <ListBox ItemsSource="{Binding Tasks}"
+                             BorderThickness="0"
+                             Background="Transparent">
+                        <ListBox.Style>
+                            <Style TargetType="ListBox">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Tasks.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.Style>
+
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,0,0,12">
+                                    <CheckBox Content="{Binding Title}"
+                                              IsChecked="{Binding IsCompleted, Mode=TwoWay}"
+                                              FontSize="14"
+                                              FontWeight="SemiBold"
+                                              Foreground="DarkSlateGray"/>
+                                    <TextBlock Text="{Binding Time}"
+                                               FontSize="12"
+                                               Foreground="DarkGray"
+                                               Margin="22,2,0,0"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
             </Border>
         </Grid>
     </Grid>
