@@ -61,9 +61,25 @@
                     CornerRadius="6"
                     Margin="0,0,6,0"
                     Padding="12">
-                <TextBlock Text="Aucun événement"
-                           TextWrapping="Wrap"
-                           Foreground="DarkGray"/>
+                <ListBox ItemsSource="{Binding Events}"
+                         BorderThickness="0"
+                         Background="Transparent">
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Text="{Binding Title}"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="DarkSlateGray"/>
+
+                                <TextBlock Text="{Binding StartTime}"
+                                           FontSize="12"
+                                           Foreground="DarkGray"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </Border>
             
             <Border Grid.Column="1"
