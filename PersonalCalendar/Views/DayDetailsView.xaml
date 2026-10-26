@@ -89,9 +89,29 @@
                     CornerRadius="6"
                     Margin="6,0,0,0"
                     Padding="12">
-                <TextBlock Text="Aucune tâche"
-                           TextWrapping="Wrap"
-                           Foreground="DarkGray"/>
+                <ListBox ItemsSource="{Binding Tasks}"
+                         BorderThickness="0"
+                         Background="Transparent">
+                    
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Text="{Binding Title}"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="DarkSlateGray"/>
+                                
+                                <TextBlock Text="{Binding Time}"
+                                           FontSize="12"
+                                           Foreground="DarkGray"/>
+                                
+                                <TextBlock Text="{Binding IsCompleted}"
+                                           FontSize="12"
+                                           Foreground="Gray"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </Border>
         </Grid>
     </Grid>

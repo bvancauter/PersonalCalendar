@@ -8,6 +8,7 @@ namespace PersonalCalendar.Views {
     /// </summary>
     public partial class DayDetailsView : Window {
         public ObservableCollection<CalendarEvent> Events { get; } = new();
+        public ObservableCollection<CalendarTask> Tasks { get; } = new();
 
         public DayDetailsView(DateOnly selectedDate) {
             InitializeComponent();
@@ -16,10 +17,11 @@ namespace PersonalCalendar.Views {
             SelectedDateTextBlock.Text = selectedDate.ToString("dddd, d MMMM yyyy");
 
             LoadEvents(selectedDate);
+            LoadTasks(selectedDate);
         }
 
         private void LoadEvents(DateOnly selectedDate) {
-            var db = App.CreateDbContext();
+            using var db = App.CreateDbContext();
 
             var events = db.Events
                 .Where(e => e.Date == selectedDate)
@@ -30,6 +32,20 @@ namespace PersonalCalendar.Views {
 
             foreach (var calendarEvent in events) {
                 Events.Add(calendarEvent);
+            }
+        }
+
+        private void LoadTasks(DateOnly selectedDate) {
+            using var db = App.CreateDbContext();
+            var tasks = db.Tasks
+                .Where(t => t.Date == selectedDate)
+                .OrderBy(t => t.Time)
+                .ToList();
+
+            Tasks.Clear();
+
+            foreach (var task in tasks) {
+                Tasks.Add(task);
             }
         }
     }
