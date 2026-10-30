@@ -172,12 +172,29 @@
                    Foreground="DarkSlateGray"
                    Margin="3,12,3,0"
                    HorizontalAlignment="Left"/>
-        <Button Grid.Row="3"
-                Content="Voir la journée"
-                Command="{Binding ViewDayCommand}"
-                HorizontalAlignment="Right"
-                Padding="12,6"
-                Margin="0,8,0,0"
-                IsEnabled="{Binding HasSelectedDay}"/>
+        <StackPanel Grid.Row="3"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,15,0,0">
+            <Button Content="Voir la journée"
+                    Command="{Binding ViewDayCommand}"
+                    IsEnabled="{Binding HasSelectedDay}"
+                    Padding="16,9"
+                    Margin="0,0,10,0"
+                    Background="White"
+                    Foreground="DarkSlateGray"
+                    BorderBrush="LightGray"
+                    BorderThickness="1"
+                    FontWeight="SemiBold"
+                    Cursor="Hand"/>
+            <Button Content="+ Ajouter"
+                    Command="{Binding ViewCreateItemCommand}"
+                    Padding="18,9"
+                    Background="SteelBlue"
+                    Foreground="White"
+                    BorderThickness="0"
+                    FontWeight="SemiBold"
+                    Cursor="Hand"/>
+        </StackPanel>
     </Grid>
 </Window>

@@ -10,5 +10,12 @@ namespace PersonalCalendar.Services {
                 .OrderBy(e => e.StartTime)
                 .ToList();
         }
+
+        public void Create(CalendarEvent calendarEvent) {
+            using var db = App.CreateDbContext();
+
+            db.Events.Add(calendarEvent);
+            db.SaveChanges();
+        }
     }
 }

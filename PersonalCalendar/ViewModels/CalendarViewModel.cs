@@ -52,6 +52,7 @@ namespace PersonalCalendar.ViewModels {
         public ICommand NextMonthCommand { get; }
         public ICommand SelectDayCommand { get; }
         public ICommand ViewDayCommand { get; }
+        public ICommand ViewCreateItemCommand { get; }
 
         public CalendarViewModel() {
             PreviousMonthCommand = new RelayCommand(_ => CurrentMonth = CurrentMonth.AddMonths(-1));
@@ -67,6 +68,13 @@ namespace PersonalCalendar.ViewModels {
                     window.ShowDialog();
                 }
             }, _ => SelectedDay is not null);
+            ViewCreateItemCommand = new RelayCommand(_ => {
+                var selectedDate = SelectedDay?.Date ?? DateOnly.FromDateTime(DateTime.Today);
+                var window = new CreateItemView(selectedDate);
+                window.Owner = Application.Current.MainWindow;
+                window.ShowDialog();
+            });
+
             GenerateDays();
         }
 
