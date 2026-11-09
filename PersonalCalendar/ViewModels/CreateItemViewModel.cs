@@ -244,6 +244,7 @@ namespace PersonalCalendar.ViewModels {
 
                 _taskService.Create(task);
             }
+            RequestClose?.Invoke();
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -251,5 +252,7 @@ namespace PersonalCalendar.ViewModels {
         private void OnPropertyChanged([CallerMemberName] string? propertyName = null) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public event Action? RequestClose;
     }
 }
