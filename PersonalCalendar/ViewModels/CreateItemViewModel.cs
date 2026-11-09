@@ -21,6 +21,10 @@ namespace PersonalCalendar.ViewModels {
         private TimeOnly? _taskTime;
         private string? _errorMessage;
 
+        private string _startTimeText = string.Empty;
+        private string _endTimeText = string.Empty;
+        private string _taskTimeText = string.Empty;
+
         public bool IsEventSelected {
             get => _isEventSelected;
             set {
@@ -28,6 +32,8 @@ namespace PersonalCalendar.ViewModels {
                     _isEventSelected = value;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(IsEventSelected));
+                    OnPropertyChanged(nameof(ShowEventTimes));
+                    OnPropertyChanged(nameof(ShowTaskTime));
                 }
             }
         }
@@ -79,6 +85,8 @@ namespace PersonalCalendar.ViewModels {
                 if (_isAllDay != value) {
                     _isAllDay = value;
                     OnPropertyChanged();
+                    OnPropertyChanged(nameof(ShowEventTimes));
+                    OnPropertyChanged(nameof(ShowTaskTime));
                 }
             }
         }
@@ -123,6 +131,39 @@ namespace PersonalCalendar.ViewModels {
             }
         }
 
+        public string StartTimeText {
+            get => _startTimeText;
+            set {
+                if (_startTimeText != value) {
+                    _startTimeText = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string EndTimeText {
+            get => _endTimeText;
+            set {
+                if (_endTimeText != value) {
+                    _endTimeText = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string TaskTimeText {
+            get => _taskTimeText;
+            set {
+                if (_taskTimeText != value) {
+                    _taskTimeText = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool ShowEventTimes => IsEventSelected && !IsAllDay;
+        public bool ShowTaskTime => IsTaskSelected && !IsAllDay;
+
         public ICommand CreateItemCommand { get; }
 
         public CreateItemViewModel(DateOnly selectedDate) {
@@ -139,34 +180,62 @@ namespace PersonalCalendar.ViewModels {
                 return;
             }
             if (IsEventSelected) {
+                TimeOnly? startTime = null;
+                TimeOnly? endTime = null;
                 if (!IsAllDay) {
-                    if (StartTime.HasValue != EndTime.HasValue) {
-                        ErrorMessage = "Both start and end times must be provided for non-all-day events.";
+                    if (!string.IsNullOrWhiteSpace(StartTimeText)) {
+                        if (!TimeOnly.TryParse(StartTimeText, out TimeOnly parsedStartTime)) {
+                            ErrorMessage = "Invalid start time format. Use HH:mm.";
+                            return;
+                        }
+                        startTime = parsedStartTime;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(EndTimeText)) {
+                        if (!TimeOnly.TryParse(EndTimeText, out TimeOnly parsedEndTime)) {
+                            ErrorMessage = "Invalid end time format. Use HH:mm.";
+                            return;
+                        }
+                        endTime = parsedEndTime;
+                    }
+
+                    if (startTime.HasValue != endTime.HasValue) {
+                        ErrorMessage = "Both start and end times must be provided or both must be empty.";
                         return;
                     }
-                    if (StartTime.HasValue && EndTime.HasValue && StartTime.Value >= EndTime.Value) {
-                        ErrorMessage = "Start time must be before end time.";
+
+                    if (startTime.HasValue && endTime.HasValue && startTime.Value >= endTime.Value) {
+                        ErrorMessage = "Start time cannot be later than end time.";
                         return;
                     }
+
+                    CalendarEvent calendarEvent = new CalendarEvent {
+                        Title = Title.Trim(),
+                        Description = Description,
+                        Date = Date,
+                        StartTime = startTime,
+                        EndTime = endTime
+                    };
+
+                    _eventService.Create(calendarEvent);
+                } else {
+                    TimeOnly? taskTime = null;
+                    if (!IsAllDay && !string.IsNullOrWhiteSpace(TaskTimeText)) {
+                        if (!TimeOnly.TryParse(TaskTimeText, out TimeOnly parsedTaskTime)) {
+                            ErrorMessage = "Invalid task time format. Use HH:mm.";
+                            return;
+                        }
+                        taskTime = parsedTaskTime;
+                    }
+                    var task = new CalendarTask {
+                        Title = Title.Trim(),
+                        Description = Description,
+                        Date = Date,
+                        Time = taskTime
+                    };
+
+                    _taskService.Create(task);
                 }
-
-                CalendarEvent calendarEvent = new CalendarEvent {
-                    Title = Title.Trim(),
-                    Description = Description,
-                    Date = Date,
-                    StartTime = IsAllDay ? null : StartTime,
-                    EndTime = IsAllDay ? null : EndTime
-                };
-
-                _eventService.Create(calendarEvent);
-            } else {
-                CalendarTask calendarTask = new CalendarTask {
-                    Title = Title.Trim(),
-                    Description = Description,
-                    Date = Date,
-                    Time = TaskTime
-                };
-                _taskService.Create(calendarTask);
             }
         }
 
