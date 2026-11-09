@@ -10,7 +10,7 @@ namespace PersonalCalendar.ViewModels {
         private readonly EventService _eventService = new EventService();
         private readonly TaskService _taskService = new TaskService();
 
-        private bool _isEventSelected;
+        private bool _isEventSelected = true;
         private string _title = string.Empty;
         private string? _description;
         private DateOnly _date;
@@ -31,7 +31,7 @@ namespace PersonalCalendar.ViewModels {
                 if (_isEventSelected != value) {
                     _isEventSelected = value;
                     OnPropertyChanged();
-                    OnPropertyChanged(nameof(IsEventSelected));
+                    OnPropertyChanged(nameof(IsTaskSelected));
                     OnPropertyChanged(nameof(ShowEventTimes));
                     OnPropertyChanged(nameof(ShowTaskTime));
                 }
@@ -41,10 +41,8 @@ namespace PersonalCalendar.ViewModels {
         public bool IsTaskSelected {
             get => !_isEventSelected;
             set {
-                if (_isEventSelected == value) {
-                    _isEventSelected = !value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(IsTaskSelected));
+                if (value) {
+                    IsEventSelected = false;
                 }
             }
         }
@@ -55,6 +53,7 @@ namespace PersonalCalendar.ViewModels {
                 if (_title != value) {
                     _title = value;
                     OnPropertyChanged();
+                    CommandManager.InvalidateRequerySuggested();
                 }
             }
         }
@@ -175,67 +174,75 @@ namespace PersonalCalendar.ViewModels {
 
         private void CreateItem() {
             ErrorMessage = null;
+
             if (string.IsNullOrWhiteSpace(Title)) {
-                ErrorMessage = "Title is required.";
+                ErrorMessage = "Le titre est obligatoire.";
                 return;
             }
+
             if (IsEventSelected) {
                 TimeOnly? startTime = null;
                 TimeOnly? endTime = null;
+
                 if (!IsAllDay) {
                     if (!string.IsNullOrWhiteSpace(StartTimeText)) {
-                        if (!TimeOnly.TryParse(StartTimeText, out TimeOnly parsedStartTime)) {
-                            ErrorMessage = "Invalid start time format. Use HH:mm.";
+                        if (!TimeOnly.TryParse(StartTimeText, out var parsedStartTime)) {
+                            ErrorMessage = "Format de l'heure de début invalide. Utilise HH:mm.";
                             return;
                         }
+
                         startTime = parsedStartTime;
                     }
 
                     if (!string.IsNullOrWhiteSpace(EndTimeText)) {
-                        if (!TimeOnly.TryParse(EndTimeText, out TimeOnly parsedEndTime)) {
-                            ErrorMessage = "Invalid end time format. Use HH:mm.";
+                        if (!TimeOnly.TryParse(EndTimeText, out var parsedEndTime)) {
+                            ErrorMessage = "Format de l'heure de fin invalide. Utilise HH:mm.";
                             return;
                         }
+
                         endTime = parsedEndTime;
                     }
 
                     if (startTime.HasValue != endTime.HasValue) {
-                        ErrorMessage = "Both start and end times must be provided or both must be empty.";
+                        ErrorMessage = "Renseigne les deux horaires ou laisse-les vides.";
                         return;
                     }
 
-                    if (startTime.HasValue && endTime.HasValue && startTime.Value >= endTime.Value) {
-                        ErrorMessage = "Start time cannot be later than end time.";
+                    if (startTime.HasValue && endTime <= startTime) {
+                        ErrorMessage = "L'heure de fin doit être après l'heure de début.";
                         return;
                     }
-
-                    CalendarEvent calendarEvent = new CalendarEvent {
-                        Title = Title.Trim(),
-                        Description = Description,
-                        Date = Date,
-                        StartTime = startTime,
-                        EndTime = endTime
-                    };
-
-                    _eventService.Create(calendarEvent);
-                } else {
-                    TimeOnly? taskTime = null;
-                    if (!IsAllDay && !string.IsNullOrWhiteSpace(TaskTimeText)) {
-                        if (!TimeOnly.TryParse(TaskTimeText, out TimeOnly parsedTaskTime)) {
-                            ErrorMessage = "Invalid task time format. Use HH:mm.";
-                            return;
-                        }
-                        taskTime = parsedTaskTime;
-                    }
-                    var task = new CalendarTask {
-                        Title = Title.Trim(),
-                        Description = Description,
-                        Date = Date,
-                        Time = taskTime
-                    };
-
-                    _taskService.Create(task);
                 }
+
+                var calendarEvent = new CalendarEvent {
+                    Title = Title.Trim(),
+                    Description = Description,
+                    Date = Date,
+                    StartTime = startTime,
+                    EndTime = endTime
+                };
+
+                _eventService.Create(calendarEvent);
+            } else {
+                TimeOnly? taskTime = null;
+
+                if (!IsAllDay && !string.IsNullOrWhiteSpace(TaskTimeText)) {
+                    if (!TimeOnly.TryParse(TaskTimeText, out var parsedTaskTime)) {
+                        ErrorMessage = "Format de l'heure de la tâche invalide. Utilise HH:mm.";
+                        return;
+                    }
+
+                    taskTime = parsedTaskTime;
+                }
+
+                var task = new CalendarTask {
+                    Title = Title.Trim(),
+                    Description = Description,
+                    Date = Date,
+                    Time = taskTime
+                };
+
+                _taskService.Create(task);
             }
         }
 
