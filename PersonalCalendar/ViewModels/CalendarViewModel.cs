@@ -77,6 +77,7 @@ namespace PersonalCalendar.ViewModels {
                 var window = new CreateItemView(selectedDate);
                 window.Owner = Application.Current.MainWindow;
                 window.ShowDialog();
+                GenerateDays();
             });
 
             GenerateDays();
