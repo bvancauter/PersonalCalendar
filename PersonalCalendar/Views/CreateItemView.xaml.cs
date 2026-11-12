@@ -9,7 +9,7 @@ namespace PersonalCalendar.Views {
         public CreateItemView(DateOnly selectedDate) {
             InitializeComponent();
             var viewModel = new CreateItemViewModel(selectedDate);
-            viewModel.RequestClose += () => this.Close();
+            viewModel.RequestClose += () => Close();
             DataContext = viewModel;
         }
     }
