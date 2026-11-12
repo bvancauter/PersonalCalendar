@@ -12,7 +12,8 @@
         Background="WhiteSmoke">
 
     <Window.Resources>
-
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        
         <Style x:Key="NavigationButtonStyle" TargetType="Button">
             <Setter Property="Padding" Value="14,8"/>
             <Setter Property="Margin" Value="10,0"/>
@@ -158,8 +159,27 @@
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
-                                <TextBlock Text="{Binding DayNumber}" 
-                                           Style="{StaticResource DayNumberStyle}"/>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding DayNumber}"
+                                               Style="{StaticResource DayNumberStyle}"/>
+
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Center"
+                                                Margin="0,5,0,0">
+                                        
+                                        <Ellipse Width="7"
+                                                 Height="7"
+                                                 Fill="SteelBlue"
+                                                 Margin="2,0"
+                                                 Visibility="{Binding HasEvents, Converter={StaticResource BoolToVisibility}}"/>
+
+                                        <Ellipse Width="7"
+                                                 Height="7"
+                                                 Fill="SeaGreen"
+                                                 Margin="2,0"
+                                                 Visibility="{Binding HasTasks, Converter={StaticResource BoolToVisibility}}"/>
+                                    </StackPanel>
+                                </StackPanel>
                             </Border>
                         </Button>
                     </DataTemplate>

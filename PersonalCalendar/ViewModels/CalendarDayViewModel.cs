@@ -18,6 +18,28 @@ namespace PersonalCalendar.ViewModels {
             }
         }
 
+        private bool _hasEvents;
+        public bool HasEvents {
+            get => _hasEvents;
+            set {
+                if (_hasEvents != value) {
+                    _hasEvents = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _hasTasks;
+        public bool HasTasks {
+            get => _hasTasks;
+            set {
+                if (_hasTasks != value) {
+                    _hasTasks = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public CalendarDayViewModel(DateOnly date, int displayedMonth, int displayedYear) {
             Date = date;
             IsCurrentMonth = date.Month == displayedMonth && date.Year == displayedYear;

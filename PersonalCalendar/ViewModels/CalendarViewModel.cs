@@ -1,4 +1,5 @@
 ﻿using PersonalCalendar.Commands;
+using PersonalCalendar.Services;
 using PersonalCalendar.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -8,6 +9,9 @@ using System.Windows.Input;
 
 namespace PersonalCalendar.ViewModels {
     public class CalendarViewModel : INotifyPropertyChanged {
+        private readonly EventService _eventService = new();
+        private readonly TaskService _taskService = new();
+
         private DateTime _currentMonth = new(DateTime.Today.Year, DateTime.Today.Month, 1);
         public DateTime CurrentMonth {
             get => _currentMonth;
@@ -88,9 +92,16 @@ namespace PersonalCalendar.ViewModels {
 
             var firstDayToDisplay = firstDayOfMonth.AddDays(-offset);
 
+            var monthEvents = _eventService.GetByMonth(CurrentMonth.Year, CurrentMonth.Month);
+            var monthTasks = _taskService.GetByMonth(CurrentMonth.Year, CurrentMonth.Month);
+
             for (int i = 0; i < 42; i++) {
                 var date = firstDayToDisplay.AddDays(i);
-                Days.Add(new CalendarDayViewModel(date, CurrentMonth.Month, CurrentMonth.Year));
+                var day = new CalendarDayViewModel(date, CurrentMonth.Month, CurrentMonth.Year) {
+                    HasEvents = monthEvents.Any(e => e.Date == date),
+                    HasTasks = monthTasks.Any(t => t.Date == date)
+                };
+                Days.Add(day);
             }
         }
 

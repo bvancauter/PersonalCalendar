@@ -17,5 +17,13 @@ namespace PersonalCalendar.Services {
             db.Tasks.Add(calendarTask);
             db.SaveChanges();
         }
+
+        public List<CalendarTask> GetByMonth(int year, int month) {
+            using var db = App.CreateDbContext();
+
+            return db.Tasks
+                .Where(t => t.Date.Year == year && t.Date.Month == month)
+                .ToList();
+        }
     }
 }
