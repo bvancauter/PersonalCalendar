@@ -169,6 +169,7 @@ namespace PersonalCalendar.ViewModels {
         public bool ShowTaskTime => IsTaskSelected && !IsAllDay;
 
         public ICommand CreateItemCommand { get; }
+        public string ActionButtonText => IsEditMode ? "Modifier" : "Créer";
 
         public ItemEditorViewModel(DateOnly selectedDate) {
             Date = selectedDate;
