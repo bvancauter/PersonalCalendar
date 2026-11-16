@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
 namespace PersonalCalendar.ViewModels {
-    public class CreateItemViewModel : INotifyPropertyChanged {
+    public class ItemEditorViewModel : INotifyPropertyChanged {
         private readonly EventService _eventService = new EventService();
         private readonly TaskService _taskService = new TaskService();
 
@@ -24,6 +24,11 @@ namespace PersonalCalendar.ViewModels {
         private string _startTimeText = string.Empty;
         private string _endTimeText = string.Empty;
         private string _taskTimeText = string.Empty;
+
+        private CalendarEvent? _eventToEdit;
+        private CalendarTask? _taskToEdit;
+
+        public bool IsEditMode => _eventToEdit is not null || _taskToEdit is not null;
 
         public bool IsEventSelected {
             get => _isEventSelected;
@@ -165,10 +170,43 @@ namespace PersonalCalendar.ViewModels {
 
         public ICommand CreateItemCommand { get; }
 
-        public CreateItemViewModel(DateOnly selectedDate) {
+        public ItemEditorViewModel(DateOnly selectedDate) {
             Date = selectedDate;
             CreateItemCommand = new RelayCommand(
                 _ => CreateItem(),
+                _ => !string.IsNullOrWhiteSpace(Title));
+        }
+
+        public ItemEditorViewModel(CalendarEvent calendarEvent) {
+            _eventToEdit = calendarEvent;
+
+            IsEventSelected = true;
+            Title = calendarEvent.Title;
+            Description = calendarEvent.Description;
+            Date = calendarEvent.Date;
+            IsAllDay = !calendarEvent.StartTime.HasValue;
+
+            StartTime = calendarEvent.StartTime;
+            EndTime = calendarEvent.EndTime;
+
+            CreateItemCommand = new RelayCommand(
+                _ => UpdateItem(),
+                _ => !string.IsNullOrWhiteSpace(Title));
+        }
+
+        public ItemEditorViewModel(CalendarTask calendarTask) {
+            _taskToEdit = calendarTask;
+
+            IsEventSelected = false;
+            Title = calendarTask.Title;
+            Description = calendarTask.Description;
+            Date = calendarTask.Date;
+            IsAllDay = !calendarTask.Time.HasValue;
+
+            TaskTime = calendarTask.Time;
+
+            CreateItemCommand = new RelayCommand(
+                _ => UpdateItem(),
                 _ => !string.IsNullOrWhiteSpace(Title));
         }
 
@@ -244,6 +282,78 @@ namespace PersonalCalendar.ViewModels {
 
                 _taskService.Create(task);
             }
+            RequestClose?.Invoke();
+        }
+
+        private void UpdateItem() {
+            ErrorMessage = null;
+
+            if (string.IsNullOrWhiteSpace(Title)) {
+                ErrorMessage = "Le titre est obligatoire.";
+                return;
+            }
+
+            if (_eventToEdit is not null) {
+                TimeOnly? startTime = null;
+                TimeOnly? endTime = null;
+
+                if (!IsAllDay) {
+                    if (!string.IsNullOrWhiteSpace(StartTimeText)) {
+                        if (!TimeOnly.TryParse(StartTimeText, out var parsedStart)) {
+                            ErrorMessage = "Format de l'heure de début invalide. Utilise HH:mm.";
+                            return;
+                        }
+
+                        startTime = parsedStart;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(EndTimeText)) {
+                        if (!TimeOnly.TryParse(EndTimeText, out var parsedEnd)) {
+                            ErrorMessage = "Format de l'heure de fin invalide. Utilise HH:mm.";
+                            return;
+                        }
+
+                        endTime = parsedEnd;
+                    }
+
+                    if (startTime.HasValue != endTime.HasValue) {
+                        ErrorMessage = "Renseigne les deux horaires ou laisse-les vides.";
+                        return;
+                    }
+
+                    if (startTime.HasValue && endTime <= startTime) {
+                        ErrorMessage = "L'heure de fin doit être après l'heure de début.";
+                        return;
+                    }
+                }
+
+                _eventToEdit.Title = Title.Trim();
+                _eventToEdit.Description = Description;
+                _eventToEdit.Date = Date;
+                _eventToEdit.StartTime = startTime;
+                _eventToEdit.EndTime = endTime;
+
+                _eventService.Update(_eventToEdit);
+            } else if (_taskToEdit is not null) {
+                TimeOnly? taskTime = null;
+
+                if (!IsAllDay && !string.IsNullOrWhiteSpace(TaskTimeText)) {
+                    if (!TimeOnly.TryParse(TaskTimeText, out var parsedTime)) {
+                        ErrorMessage = "Format de l'heure de la tâche invalide. Utilise HH:mm.";
+                        return;
+                    }
+
+                    taskTime = parsedTime;
+                }
+
+                _taskToEdit.Title = Title.Trim();
+                _taskToEdit.Description = Description;
+                _taskToEdit.Date = Date;
+                _taskToEdit.Time = taskTime;
+
+                _taskService.Update(_taskToEdit);
+            }
+
             RequestClose?.Invoke();
         }
 

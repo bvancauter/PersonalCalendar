@@ -18,6 +18,13 @@ namespace PersonalCalendar.Services {
             db.SaveChanges();
         }
 
+        public void Update(CalendarTask calendarTask) {
+            using var db = App.CreateDbContext();
+
+            db.Tasks.Update(calendarTask);
+            db.SaveChanges();
+        }
+
         public List<CalendarTask> GetByMonth(int year, int month) {
             using var db = App.CreateDbContext();
 

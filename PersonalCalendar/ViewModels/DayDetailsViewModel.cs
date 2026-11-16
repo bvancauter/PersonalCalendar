@@ -1,6 +1,10 @@
-﻿using PersonalCalendar.Models;
+﻿using PersonalCalendar.Commands;
+using PersonalCalendar.Models;
 using PersonalCalendar.Services;
+using PersonalCalendar.Views;
 using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Input;
 
 namespace PersonalCalendar.ViewModels {
     public class DayDetailsViewModel {
@@ -12,11 +16,46 @@ namespace PersonalCalendar.ViewModels {
         public DateOnly SelectedDate { get; }
         public string SelectedDateText => SelectedDate.ToString("dddd, d MMMM yyyy");
 
+        public ICommand EditEventCommand { get; }
+        public ICommand EditTaskCommand { get; }
+
         public DayDetailsViewModel(DateOnly selectedDate) {
             SelectedDate = selectedDate;
 
             _eventService = new EventService();
             _taskService = new TaskService();
+
+            EditEventCommand = new RelayCommand(
+                item => EditEvent(item as CalendarEvent),
+                item => item is CalendarEvent);
+
+            EditTaskCommand = new RelayCommand(
+                item => EditTask(item as CalendarTask),
+                item => item is CalendarTask);
+
+            LoadEvents();
+            LoadTasks();
+        }
+
+        private void EditEvent(CalendarEvent? calendarEvent) {
+            if (calendarEvent is null) {
+                return;
+            }
+
+            var window = new CreateItemView(calendarEvent) { Owner = Application.Current.MainWindow };
+            window.ShowDialog();
+
+            LoadEvents();
+            LoadTasks();
+        }
+
+        private void EditTask(CalendarTask? calendarTask) {
+            if (calendarTask is null) {
+                return;
+            }
+
+            var window = new CreateItemView(calendarTask) { Owner = Application.Current.MainWindow };
+            window.ShowDialog();
 
             LoadEvents();
             LoadTasks();
