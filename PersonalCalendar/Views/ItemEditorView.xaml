@@ -133,7 +133,7 @@
                        Margin="0,0,0,10"/>
 
             <Button Content="{Binding ActionButtonText}"
-                    Command="{Binding CreateItemCommand}"
+                    Command="{Binding SaveItemCommand}"
                     Height="38"
                     Width="120"
                     HorizontalAlignment="Right"

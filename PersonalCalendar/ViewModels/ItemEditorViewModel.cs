@@ -168,12 +168,12 @@ namespace PersonalCalendar.ViewModels {
         public bool ShowEventTimes => IsEventSelected && !IsAllDay;
         public bool ShowTaskTime => IsTaskSelected && !IsAllDay;
 
-        public ICommand CreateItemCommand { get; }
+        public ICommand SaveItemCommand { get; }
         public string ActionButtonText => IsEditMode ? "Modifier" : "Créer";
 
         public ItemEditorViewModel(DateOnly selectedDate) {
             Date = selectedDate;
-            CreateItemCommand = new RelayCommand(
+            SaveItemCommand = new RelayCommand(
                 _ => CreateItem(),
                 _ => !string.IsNullOrWhiteSpace(Title));
         }
@@ -190,7 +190,7 @@ namespace PersonalCalendar.ViewModels {
             StartTime = calendarEvent.StartTime;
             EndTime = calendarEvent.EndTime;
 
-            CreateItemCommand = new RelayCommand(
+            SaveItemCommand = new RelayCommand(
                 _ => UpdateItem(),
                 _ => !string.IsNullOrWhiteSpace(Title));
         }
@@ -206,7 +206,7 @@ namespace PersonalCalendar.ViewModels {
 
             TaskTime = calendarTask.Time;
 
-            CreateItemCommand = new RelayCommand(
+            SaveItemCommand = new RelayCommand(
                 _ => UpdateItem(),
                 _ => !string.IsNullOrWhiteSpace(Title));
         }
